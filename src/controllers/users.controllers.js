@@ -6,6 +6,7 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 
 const registerUser = asynchandler(async (req, res) => {
 
+    console.log("running in controller", req.body, req.files)
     // get details from frontend
     // validate the deatails
     // check if user already exists
@@ -17,17 +18,17 @@ const registerUser = asynchandler(async (req, res) => {
     // return response
 
     const { username, email, fullname, password } = req.body
-    console.log("email:", email);
-    console.log("username:", username);
+    // console.log("email:", email);
+    // console.log("username:", username);
 
     if (
         [username, email, fullname, password].some((field) =>
-            field ? trim() === "")
+            field?.trim() === "")
     ) {
         throw new ApiError("All fields are required");
     }
 
-    const existedUser = User.findOne({
+    const existedUser =await User.findOne({
         $or:[{email},{username}]
     })
 
@@ -37,15 +38,21 @@ const registerUser = asynchandler(async (req, res) => {
     }
 
    const avatarLocalPath= req.files?.avatar[0]?.path
-   const coverimageLocalPath= req.files?.coverimage[0]?.path
+//    const coverimageLocalPath= req.files?.coverimage[0]?.path
 
+let coverimageLocalPath;
+if (req.files && Array.isArray(req.files.coverimage)&& req.files.coverimage.length>0) {
+    coverimageLocalPath= req.files.coverimage[0].path
+} 
    if (!avatarLocalPath) {
     throw new ApiError(400,"avatar is required");
     
    }
 
    const avatar= await uploadOnCloudinary(avatarLocalPath)
-   const coverimage= await uploadOnCloudinary(coverimageLocalPath)
+  const coverimage= await uploadOnCloudinary(coverimageLocalPath)
+
+  console.log("hello", avatar, coverimage)
 
 
    if (!avatar) {
@@ -62,7 +69,7 @@ const user =await User.create({
     avatar: avatar.url
 })
 
-const createdUser = User.findById(user._id).select("-password -refreshToken")
+const createdUser =await User.findById(user._id).select("-password -refreshToken")
 
 if (!createdUser) {
     throw new ApiError("something went wrong ehile registering the user");
@@ -72,6 +79,11 @@ if (!createdUser) {
 return res.status(201).json(
     new ApiResponse (200, createdUser,"user registered successfully")
 )
+
+// const response = new ApiResponse(200, createdUser, "User registered successfully");
+// console.log("Response:", JSON.stringify(response));
+// return res.status(201).json(response);
+
 
 })
 
