@@ -5,33 +5,33 @@ import jwt from "jsonwebtoken";
 const userSchema = new Schema(
     {
         username: {
-            type: string,
+            type: String,
             required: true,
             unique: true,
-            lowercasde: true,
+            lowercase: true,
             trim: true,
             index: true
         },
         email: {
-            type: string,
+            type: String,
             required: true,
             unique: true,
-            lowercasde: true
+            lowercase: true
 
         },
         fullname: {
-            type: string,
+            type: String,
             required: true,
             trim: true,
             index: true
 
         },
         avatar: {
-            type: string, //cloudinary url
+            type: String, //cloudinary url
             required: true
         },
         coverimage: {
-            type: string,
+            type: String,
             
         },
         watchHistory: [
@@ -41,11 +41,11 @@ const userSchema = new Schema(
             }
         ],
         password: {
-            type: string,
+            type: String,
             required: true
         },
         refreshToken: {
-            type: string
+            type: String
         }
 
     }, { timestamps: true }
